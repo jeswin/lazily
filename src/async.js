@@ -1,6 +1,6 @@
-export class Seq {
+export class AsyncSeq {
   static of(list) {
-    return new Seq(sequence(list));
+    return new AsyncSeq(sequence(list));
   }
 
   constructor(seq) {
@@ -13,40 +13,46 @@ export class Seq {
     }
   }
 
-  concat(seq) {
-    return new Seq(concat(this.seq, seq.seq));
+  async *[Symbol.asyncIterator]() {
+    for await (const i of this.seq()) {
+      yield i;
+    }
   }
 
-  every(fn) {
-    return every(this.seq, fn)
+  concat(seq) {
+    return new AsyncSeq(concat(this.seq, seq.seq));
+  }
+
+  async every(fn) {
+    return await every(this.seq, fn)
   }
 
   exit(fn, result) {
-    return new Seq(exit(this.seq, fn, result));
+    return new AsyncSeq(exit(this.seq, fn, result));
   }
 
   filter(fn) {
-    return new Seq(filter(this.seq, fn));
+    return new AsyncSeq(filter(this.seq, fn));
   }
 
-  find(fn) {
-    return find(this.seq, fn);
+  async find(fn) {
+    return await find(this.seq, fn);
   }
 
-  first() {
-    return first(this.seq);
+  async first() {
+    return await first(this.seq);
   }
 
-  includes(item) {
-    return includes(this.seq, item);
+  async includes(item) {
+    return await includes(this.seq, item);
   }
 
-  last() {
-    return last(this.seq);
+  async last() {
+    return await last(this.seq);
   }
 
   map(fn) {
-    return new Seq(map(this.seq, fn));
+    return new AsyncSeq(map(this.seq, fn));
   }
 
   reduce(fn, initialValue) {
@@ -54,25 +60,25 @@ export class Seq {
   }
 
   slice(begin, end) {
-    return new Seq(slice(this.seq, begin, end));
+    return new AsyncSeq(slice(this.seq, begin, end));
   }
 
-  some(fn) {
-    return some(this.seq, fn)
+  async some(fn) {
+    return await some(this.seq, fn)
   }
 
   reverse() {
-    return new Seq(reverse(this.seq));
+    return new AsyncSeq(reverse(this.seq));
   }
 
-  toArray() {
-    return toArray(this.seq);
+  async toArray() {
+    return await toArray(this.seq);
   }
 }
 
 export function sequence(list) {
-  return function* gen() {
-    for (const item of list) {
+  return async function* gen() {
+    for await (const item of list) {
       yield item;
     }
   };
@@ -80,19 +86,20 @@ export function sequence(list) {
 
 
 export function concat(seq, newSeq) {
-  return function*() {
+  return async function*() {
     for (const i of seq()) {
-      yield i;
+      yield await i;
     }
     for (const j of newSeq()) {
-      yield j;
+      yield await j;
     }
   }
 }
 
-export function every(seq, fn) {
-  for (const item of seq()) {
-    if (!fn(item)) {
+export async function every(seq, fn) {
+  const items = seq.toArray();
+  for await (const item of items) {
+    if (!await fn(item)) {
       return false;
     }
   }
@@ -101,8 +108,7 @@ export function every(seq, fn) {
 
 export function exit(seq, fn, result) {
   return async function*() {
-    for (const _item of seq()) {
-      const item = await _item;
+    for await (const item of seq()) {
       if (await fn(item)) {
         return
       }
@@ -111,71 +117,71 @@ export function exit(seq, fn, result) {
   };
 }
 
-export function find(seq, fn) {
-  for (const item of seq()) {
-    if (fn(item)) {
+export async function find(seq, fn) {
+  for await (const item of seq()) {
+    if (await fn(item)) {
       return item;
     }
   }
 }
 
 export function filter(seq, fn) {
-  return function*() {
-    for (const item of seq()) {
-      if (fn(item)) {
+  return async function*() {
+    for await (const item of seq()) {
+      if (await fn(item)) {
         yield item;
       }
     }
   }
 }
 
-export function first(seq) {
-  for (const item of seq()) {
+export async function first(seq) {
+  for await (const item of seq()) {
     return item;
   }
 }
 
-export function includes(seq, what) {
-  return some(seq, item => item === what);
+export async function includes(seq, what) {
+  return await some(seq, async item => (await item) === (await what));
 }
 
-export function last(seq) {
+export async function last(seq) {
   let prev;
-  for (const item of seq()) {
+  for await (const item of seq()) {
     prev = item;
   }
   return prev;
 }
 
 export function map(seq, fn) {
-  return function*() {
-    for (const item of seq()) {
+  return async function*() {
+    for await (const item of seq()) {
       yield fn(item);
     }
   }
 }
 
-export function reduce(seq, fn, initialValue) {
+export async function reduce(seq, fn, initialValue) {
   let acc = initialValue;
-  for (const item of seq()) {
-    acc = fn(acc, item);
+  for await (const item of seq()) {
+    acc = await fn(acc, item);
   }
   return acc;
 }
 
 export function reverse(seq) {
-  return function*() {
-    const all = toArray(seq).reverse();
-    for (const item of all) {
+  return async function*() {
+    const all = await toArray(seq).reverse();
+    for await (const item of all) {
       yield item;
     }
   }
 }
 
 export function slice(seq, begin, end) {
-  return function*() {
+  return async function*() {
     let i = 0;
-    for (const item of seq()) {
+    for await (const item of seq()) {
       if (i >= begin && (!end || i < end)) {
         yield item;
       }
@@ -187,18 +193,18 @@ export function slice(seq, begin, end) {
   }
 }
 
-export function some(seq, fn) {
-  for (const item of seq()) {
-    if (fn(item)) {
+export async function some(seq, fn) {
+  for await (const item of seq()) {
+    if (await fn(item)) {
       return true;
     }
   }
   return false;
 }
 
-export function toArray(seq) {
+export async function toArray(seq) {
   const results = [];
-  for (const item of seq()) {
+  for await (const item of seq()) {
     results.push(item);
   }
   return results;
