@@ -13,14 +13,6 @@ function toArray(seq) {
   return results;
 }
 
-async function toArrayAsync(seq) {
-  const results = [];
-  for await (const i of seq) {
-    results.push(i);
-  }
-  return results;
-}
-
 describe("lazily", async () => {
   it(`should return a sequence`, async () => {
     const seq = Seq.of([1, 2, 3])
@@ -30,12 +22,7 @@ describe("lazily", async () => {
 
   it(`should map() results`, async () => {
     const seq = Seq.of([1, 2, 3]).map(x => x * 2)
-
-    const results = [];
-    for (const i of seq) {
-      results.push(i);
-    }
-
+    const results = toArray(seq);
     results.should.deepEqual([2, 4, 6])
   })
 
