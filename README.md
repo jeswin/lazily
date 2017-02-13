@@ -12,6 +12,8 @@ npm install lazily
 
 ## Create a sequence
 ```javascript
+import { Seq } from "lazily";
+ 
 const seq = Seq.of([1, 2, 3])
 for (const i of seq) {
   console.log(i)
