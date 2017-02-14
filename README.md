@@ -100,7 +100,7 @@ Seq.of([1, 2, 3, 4, 5]).first();
 ## first(predicate)
 ```javascript
 Seq.of([1, 2, 3, 4, 5]).first(x => x > 3);
-//
+// 4
 ```
 
 ## last()
