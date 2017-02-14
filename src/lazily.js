@@ -25,6 +25,10 @@ export class Seq {
     return new Seq(exit(this.seq, fn, result));
   }
 
+  exitAfter(fn, result) {
+    return new Seq(exitAfter(this.seq, fn, result));
+  }
+
   filter(fn) {
     return new Seq(filter(this.seq, fn));
   }
@@ -33,16 +37,16 @@ export class Seq {
     return find(this.seq, fn);
   }
 
-  first() {
-    return first(this.seq);
+  first(predicate) {
+    return first(this.seq, predicate);
   }
 
   includes(item) {
     return includes(this.seq, item);
   }
 
-  last() {
-    return last(this.seq);
+  last(predicate) {
+    return last(this.seq, predicate);
   }
 
   map(fn) {
@@ -110,6 +114,18 @@ export function exit(seq, fn, result) {
   };
 }
 
+export function exitAfter(seq, fn, result) {
+  return function*() {
+    for (const item of seq()) {
+      if (fn(item)) {
+        yield item;
+        return
+      }
+      yield item;
+    }
+  };
+}
+
 export function find(seq, fn) {
   for (const item of seq()) {
     if (fn(item)) {
@@ -128,7 +144,9 @@ export function filter(seq, fn) {
   }
 }
 
-export function first(seq) {
+export function first(_seq, predicate) {
+  const seq = predicate ? filter(_seq, predicate) : _seq;
+
   for (const item of seq()) {
     return item;
   }
@@ -138,7 +156,9 @@ export function includes(seq, what) {
   return some(seq, item => item === what);
 }
 
-export function last(seq) {
+export function last(_seq, predicate) {
+  const seq = predicate ? filter(_seq, predicate) : _seq;
+
   let prev;
   for (const item of seq()) {
     prev = item;

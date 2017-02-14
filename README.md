@@ -59,6 +59,15 @@ Seq.of([1, 2, 3, 4, 5])
 // [1, 2, 3]
 ```
 
+## exitAfter(predicate)
+Similar to exit(), but includes the last item as well.
+```javascript
+Seq.of([1, 2, 3, 4, 5])
+  .exitAfter(x => x > 3)
+  .toArray()
+// [1, 2, 3, 4]
+```
+
 ## exit(predicate) in the middle
 ```javascript
 Seq.of([1, 2, 3, 4, 5])
@@ -88,10 +97,22 @@ Seq.of([1, 2, 3, 4, 5]).first();
 // 1
 ```
 
+## first(predicate)
+```javascript
+Seq.of([1, 2, 3, 4, 5]).first(x => x > 3);
+//
+```
+
 ## last()
 ```javascript
 Seq.of([1, 2, 3, 4, 5]).last();
 // 5
+```
+
+## last(predicate)
+```javascript
+Seq.of([1, 2, 3, 4, 5]).last(x => x < 3);
+// 2
 ```
 
 ## every(predicate)
