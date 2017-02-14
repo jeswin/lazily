@@ -57,16 +57,16 @@ export class Seq {
     return reduce(this.seq, fn, initialValue, fnShortCircuit)
   }
 
+  reverse() {
+    return new Seq(reverse(this.seq));
+  }
+
   slice(begin, end) {
     return new Seq(slice(this.seq, begin, end));
   }
 
   some(fn) {
     return some(this.seq, fn)
-  }
-
-  reverse() {
-    return new Seq(reverse(this.seq));
   }
 
   toArray() {
