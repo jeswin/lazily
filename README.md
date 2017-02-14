@@ -13,7 +13,7 @@ npm install lazily
 ## Create a sequence
 ```javascript
 import { Seq } from "lazily";
- 
+
 const seq = Seq.of([1, 2, 3])
 for (const i of seq) {
   console.log(i)
@@ -21,7 +21,8 @@ for (const i of seq) {
 ```
 
 ## It's lazy
-Sequences are lazy. For example, the following example only one map() action is performed irrespective of the length of the sequence.
+Sequences are lazy. For example, in the following example only one map() action is performed irrespective of the length of the sequence.
+
 ```javascript
 const seq = Seq.of([1, 2, 3])
   .map(x => x * 2)
@@ -123,7 +124,7 @@ Seq.of([1, 2, 3]).reverse().toArray();
 // [3, 2, 1]
 ```
 
-## slice(begin, end)()
+## slice(begin, end)
 ```javascript
 Seq.of([1, 2, 3, 4, 5, 6]).slice(2, 4).toArray();
 // [3, 4, 5]

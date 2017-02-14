@@ -15,15 +15,15 @@ function toArray(seq) {
 
 describe("lazily", () => {
   it(`should return a sequence`, () => {
-    const seq = Seq.of([1, 2, 3])
+    const seq = Seq.of([1, 2, 3, 4, 5])
     const results = toArray(seq);
-    results.should.deepEqual([1, 2, 3])
+    results.should.deepEqual([1, 2, 3, 4, 5])
   })
 
   it(`should map() results`, () => {
-    const seq = Seq.of([1, 2, 3]).map(x => x * 2)
+    const seq = Seq.of([1, 2, 3, 4, 5]).map(x => x * 2)
     const results = toArray(seq);
-    results.should.deepEqual([2, 4, 6])
+    results.should.deepEqual([2, 4, 6, 8, 10])
   })
 
   it(`should filter() results`, () => {
@@ -110,9 +110,9 @@ describe("lazily", () => {
   })
 
   it(`reverse()`, () => {
-    const seq = Seq.of([1, 2, 3]).reverse();
+    const seq = Seq.of([1, 2, 3, 4, 5]).reverse();
     const results = toArray(seq);
-    results.should.deepEqual([3, 2, 1])
+    results.should.deepEqual([5, 4, 3, 2, 1])
   })
 
   it(`slice(begin)`, () => {
