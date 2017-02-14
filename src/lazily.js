@@ -53,8 +53,8 @@ export class Seq {
     return new Seq(map(this.seq, fn));
   }
 
-  reduce(fn, initialValue) {
-    return reduce(this.seq, fn, initialValue)
+  reduce(fn, initialValue, fnShortCircuit) {
+    return reduce(this.seq, fn, initialValue, fnShortCircuit)
   }
 
   slice(begin, end) {
@@ -95,51 +95,61 @@ export function concat(seq, newSeq) {
 }
 
 export function every(seq, fn) {
+  let i = 0;
   for (const item of seq()) {
-    if (!fn(item)) {
+    if (!fn(item, i, seq)) {
       return false;
     }
+    i++;
   }
   return true;
 }
 
 export function exit(seq, fn, result) {
   return function*() {
+    let i = 0;
     for (const item of seq()) {
-      if (fn(item)) {
+      if (fn(item, i, seq)) {
         return
       }
       yield item;
+      i++;
     }
   };
 }
 
 export function exitAfter(seq, fn, result) {
   return function*() {
+    let i = 0;
     for (const item of seq()) {
-      if (fn(item)) {
+      if (fn(item, i, seq)) {
         yield item;
         return
       }
       yield item;
+      i++;
     }
   };
 }
 
 export function find(seq, fn) {
+  let i = 0;
   for (const item of seq()) {
-    if (fn(item)) {
+    if (fn(item, i, seq)) {
       return item;
     }
+    i++;
   }
 }
 
 export function filter(seq, fn) {
   return function*() {
+    let i = 0;
     for (const item of seq()) {
-      if (fn(item)) {
+      if (fn(item, i, seq)) {
         yield item;
       }
+      i++;
     }
   }
 }
@@ -168,16 +178,23 @@ export function last(_seq, predicate) {
 
 export function map(seq, fn) {
   return function*() {
+    let i = 0;
     for (const item of seq()) {
-      yield fn(item);
+      yield fn(item, i, seq);
+      i++;
     }
   }
 }
 
-export function reduce(seq, fn, initialValue) {
+export function reduce(seq, fn, initialValue, fnShortCircuit) {
   let acc = initialValue;
+  let i = 0;
   for (const item of seq()) {
-    acc = fn(acc, item);
+    acc = fn(acc, item, i, seq);
+    if (fnShortCircuit && fnShortCircuit(acc, item, i, seq)) {
+      return acc;
+    }
+    i++
   }
   return acc;
 }
@@ -207,10 +224,12 @@ export function slice(seq, begin, end) {
 }
 
 export function some(seq, fn) {
+  let i = 0;
   for (const item of seq()) {
-    if (fn(item)) {
+    if (fn(item, i, seq)) {
       return true;
     }
+    i++;
   }
   return false;
 }

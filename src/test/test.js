@@ -70,6 +70,12 @@ describe("lazily", () => {
     result.should.equal(15);
   })
 
+  it(`reduce() short-circuited`, () => {
+    const result = Seq.of([1, 2, 3, 4, 5])
+      .reduce((acc, x) => acc + x, 0, (acc, x) => acc > 6)
+    result.should.equal(10);
+  })
+
   it(`first()`, () => {
     const result = Seq.of([1, 2, 3, 4, 5])
       .first();
