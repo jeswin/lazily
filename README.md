@@ -68,16 +68,6 @@ Seq.of([1, 2, 3, 4, 5])
 // [1, 2, 3, 4]
 ```
 
-## exit(predicate) in the middle
-```javascript
-Seq.of([1, 2, 3, 4, 5])
-  .map(x => x * 2)
-  .exit(x => x > 4)
-  .map(x => x * 10)
-  .toArray();
-// [20, 40]
-```
-
 ## find(predicate)
 ```javascript
 Seq.of([1, 2, 3, 4, 5]).find(x => x * 10 === 30)
