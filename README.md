@@ -81,6 +81,13 @@ Seq.of([1, 2, 3, 4, 5])
 // 15
 ```
 
+## short-circuited reduce(fn, initialValue, stopPredicate)
+```javascript
+Seq.of([1, 2, 3, 4, 5])
+  .reduce((acc, x) => acc + x, 0, acc => acc > 6)
+// 10
+```
+
 ## first()
 ```javascript
 Seq.of([1, 2, 3, 4, 5]).first();
