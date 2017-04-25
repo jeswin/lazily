@@ -46,7 +46,7 @@ export class Seq<T> {
     return first(this.seq, predicate);
   }
 
-  includes(item: T) {
+  includes(item: T) : boolean {
     return includes(this.seq, item);
   }
 
@@ -61,7 +61,12 @@ export class Seq<T> {
   reduce<TAcc>(
     fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
     initialValue: TAcc,
-    fnShortCircuit: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => boolean
+    fnShortCircuit: (
+      acc: TAcc,
+      item: T,
+      i: number,
+      seq: SequenceFnType<T>
+    ) => boolean
   ) {
     return reduce(this.seq, fn, initialValue, fnShortCircuit);
   }
@@ -78,7 +83,7 @@ export class Seq<T> {
     return some(this.seq, fn);
   }
 
-  toArray() {
+  toArray() : Array<T> {
     return toArray(this.seq);
   }
 }
@@ -107,7 +112,10 @@ export function concat<T>(
   };
 }
 
-export function every<T>(seq: SequenceFnType<T>, fn: PredicateType<T>) {
+export function every<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>
+): boolean {
   let i = 0;
   for (const item of seq()) {
     if (!fn(item, i, seq)) {
@@ -223,8 +231,13 @@ export function reduce<T, TAcc>(
   seq: SequenceFnType<T>,
   fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
   initialValue: TAcc,
-  fnShortCircuit: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => boolean
-) {
+  fnShortCircuit: (
+    acc: TAcc,
+    item: T,
+    i: number,
+    seq: SequenceFnType<T>
+  ) => boolean
+): TAcc {
   let acc = initialValue;
   let i = 0;
   for (const item of seq()) {
