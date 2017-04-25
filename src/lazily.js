@@ -67,7 +67,7 @@ export class Seq<T> {
   reduce<TAcc>(
     fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => TAcc,
     initialValue: TAcc,
-    fnShortCircuit: (
+    fnShortCircuit?: (
       acc: TAcc,
       item: T,
       i?: number,
@@ -237,7 +237,7 @@ export function reduce<T, TAcc>(
   seq: SequenceFnType<T>,
   fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
   initialValue: TAcc,
-  fnShortCircuit: (
+  fnShortCircuit?: (
     acc: TAcc,
     item: T,
     i?: number,
