@@ -1,72 +1,81 @@
-export class Seq {
+/* @flow */
+type PredicateType<T> = (val: T) => boolean;
+
+export class Seq<T> {
+  seq: SequenceFnType<T>;
+
   static of(list) {
     return new Seq(sequence(list));
   }
 
-  constructor(seq) {
+  constructor(seq: SequenceFnType<T>) {
     this.seq = seq;
   }
 
-  *[Symbol.iterator]() {
+  *[Symbol.iterator](): Iterable<T> {
     for (const i of this.seq()) {
       yield i;
     }
   }
 
-  concat(seq) {
+  concat(seq: Seq<T>): Seq<T> {
     return new Seq(concat(this.seq, seq.seq));
   }
 
-  every(fn) {
-    return every(this.seq, fn)
+  every(fn: PredicateType<T>) {
+    return every(this.seq, fn);
   }
 
-  exit(fn, result) {
+  exit(fn: PredicateType<T>, result: any): Seq<T> {
     return new Seq(exit(this.seq, fn, result));
   }
 
-  exitAfter(fn, result) {
+  exitAfter(fn: PredicateType<T>, result: any): Seq<T> {
     return new Seq(exitAfter(this.seq, fn, result));
   }
 
-  filter(fn) {
+  filter(fn: PredicateType<T>): Seq<T> {
     return new Seq(filter(this.seq, fn));
   }
 
-  find(fn) {
+  find(fn: PredicateType<T>): ?T {
     return find(this.seq, fn);
   }
 
-  first(predicate) {
+  first(predicate: PredicateType<T>): ?T {
     return first(this.seq, predicate);
   }
 
-  includes(item) {
+  includes(item: T) {
     return includes(this.seq, item);
   }
 
-  last(predicate) {
+  last(predicate: PredicateType<T>): ?T {
     return last(this.seq, predicate);
   }
 
-  map(fn) {
+  map<TOut>(fn: (val: T) => TOut): Seq<TOut> {
     return new Seq(map(this.seq, fn));
   }
 
-  reduce(fn, initialValue, fnShortCircuit) {
-    return reduce(this.seq, fn, initialValue, fnShortCircuit)
+  reduce<TAcc>(
+    fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
+    initialValue: TAcc,
+    fnShortCircuit: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => boolean
+  ) {
+    return reduce(this.seq, fn, initialValue, fnShortCircuit);
   }
 
-  reverse() {
+  reverse(): Seq<T> {
     return new Seq(reverse(this.seq));
   }
 
-  slice(begin, end) {
+  slice(begin: number, end: number): Seq<T> {
     return new Seq(slice(this.seq, begin, end));
   }
 
-  some(fn) {
-    return some(this.seq, fn)
+  some(fn: PredicateType<T>) {
+    return some(this.seq, fn);
   }
 
   toArray() {
@@ -74,7 +83,9 @@ export class Seq {
   }
 }
 
-export function sequence(list) {
+type SequenceFnType<T> = () => Generator<T, void, void>;
+
+export function sequence<T>(list: Iterable<T>): SequenceFnType<T> {
   return function* gen() {
     for (const item of list) {
       yield item;
@@ -82,8 +93,10 @@ export function sequence(list) {
   };
 }
 
-
-export function concat(seq, newSeq) {
+export function concat<T>(
+  seq: SequenceFnType<T>,
+  newSeq: SequenceFnType<T>
+): SequenceFnType<T> {
   return function*() {
     for (const i of seq()) {
       yield i;
@@ -91,10 +104,10 @@ export function concat(seq, newSeq) {
     for (const j of newSeq()) {
       yield j;
     }
-  }
+  };
 }
 
-export function every(seq, fn) {
+export function every<T>(seq: SequenceFnType<T>, fn: PredicateType<T>) {
   let i = 0;
   for (const item of seq()) {
     if (!fn(item, i, seq)) {
@@ -105,12 +118,16 @@ export function every(seq, fn) {
   return true;
 }
 
-export function exit(seq, fn, result) {
+export function exit<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>,
+  result: any
+): SequenceFnType<T> {
   return function*() {
     let i = 0;
     for (const item of seq()) {
       if (fn(item, i, seq)) {
-        return
+        return result;
       }
       yield item;
       i++;
@@ -118,13 +135,17 @@ export function exit(seq, fn, result) {
   };
 }
 
-export function exitAfter(seq, fn, result) {
+export function exitAfter<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>,
+  result: any
+): SequenceFnType<T> {
   return function*() {
     let i = 0;
     for (const item of seq()) {
       if (fn(item, i, seq)) {
         yield item;
-        return
+        return result;
       }
       yield item;
       i++;
@@ -132,7 +153,7 @@ export function exitAfter(seq, fn, result) {
   };
 }
 
-export function find(seq, fn) {
+export function find<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): ?T {
   let i = 0;
   for (const item of seq()) {
     if (fn(item, i, seq)) {
@@ -142,7 +163,10 @@ export function find(seq, fn) {
   }
 }
 
-export function filter(seq, fn) {
+export function filter<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>
+): SequenceFnType<T> {
   return function*() {
     let i = 0;
     for (const item of seq()) {
@@ -151,10 +175,13 @@ export function filter(seq, fn) {
       }
       i++;
     }
-  }
+  };
 }
 
-export function first(_seq, predicate) {
+export function first<T>(
+  _seq: SequenceFnType<T>,
+  predicate: PredicateType<T>
+): ?T {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   for (const item of seq()) {
@@ -162,11 +189,14 @@ export function first(_seq, predicate) {
   }
 }
 
-export function includes(seq, what) {
+export function includes<T>(seq: SequenceFnType<T>, what: T): boolean {
   return some(seq, item => item === what);
 }
 
-export function last(_seq, predicate) {
+export function last<T>(
+  _seq: SequenceFnType<T>,
+  predicate: PredicateType<T>
+): ?T {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   let prev;
@@ -176,17 +206,25 @@ export function last(_seq, predicate) {
   return prev;
 }
 
-export function map(seq, fn) {
+export function map<T, TOut>(
+  seq: SequenceFnType<T>,
+  fn: (val: T) => TOut
+): SequenceFnType<TOut> {
   return function*() {
     let i = 0;
     for (const item of seq()) {
       yield fn(item, i, seq);
       i++;
     }
-  }
+  };
 }
 
-export function reduce(seq, fn, initialValue, fnShortCircuit) {
+export function reduce<T, TAcc>(
+  seq: SequenceFnType<T>,
+  fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
+  initialValue: TAcc,
+  fnShortCircuit: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => boolean
+) {
   let acc = initialValue;
   let i = 0;
   for (const item of seq()) {
@@ -194,21 +232,25 @@ export function reduce(seq, fn, initialValue, fnShortCircuit) {
     if (fnShortCircuit && fnShortCircuit(acc, item, i, seq)) {
       return acc;
     }
-    i++
+    i++;
   }
   return acc;
 }
 
-export function reverse(seq) {
+export function reverse<T>(seq: SequenceFnType<T>): SequenceFnType<T> {
   return function*() {
     const all = toArray(seq).reverse();
     for (const item of all) {
       yield item;
     }
-  }
+  };
 }
 
-export function slice(seq, begin, end) {
+export function slice<T>(
+  seq: SequenceFnType<T>,
+  begin: number,
+  end: number
+): SequenceFnType<T> {
   return function*() {
     let i = 0;
     for (const item of seq()) {
@@ -220,10 +262,10 @@ export function slice(seq, begin, end) {
         return;
       }
     }
-  }
+  };
 }
 
-export function some(seq, fn) {
+export function some<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): boolean {
   let i = 0;
   for (const item of seq()) {
     if (fn(item, i, seq)) {
@@ -234,7 +276,7 @@ export function some(seq, fn) {
   return false;
 }
 
-export function toArray(seq) {
+export function toArray<T>(seq: SequenceFnType<T>): Array<T> {
   const results = [];
   for (const item of seq()) {
     results.push(item);

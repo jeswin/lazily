@@ -1,6 +1,6 @@
 {
   "name": "lazily",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Jeswin<jeswinpk@agilehead.com>",
   "scripts": {
     "test": "mocha dist/test/test.js"
@@ -8,9 +8,12 @@
   "main": "dist/lazily.js",
   "dependencies": {},
   "devDependencies": {
+    "babel-cli": "^6.24.1",
     "babel-core": "^6.22.1",
+    "babel-preset-flow": "^6.23.0",
     "babel-preset-modern-browsers": "^8.0.0",
     "babel-preset-stage-2": "^6.22.0",
+    "flow-bin": "^0.44.2",
     "mocha": "*",
     "should": "*",
     "source-map-support": "^0.4.8"
