@@ -1,5 +1,9 @@
 /* @flow */
-type PredicateType<T> = (val: T) => boolean;
+type PredicateType<T> = (
+  val: T,
+  i?: number,
+  seq?: SequenceFnType<T>
+) => boolean;
 
 export class Seq<T> {
   seq: SequenceFnType<T>;
@@ -46,7 +50,7 @@ export class Seq<T> {
     return first(this.seq, predicate);
   }
 
-  includes(item: T) : boolean {
+  includes(item: T): boolean {
     return includes(this.seq, item);
   }
 
@@ -54,7 +58,9 @@ export class Seq<T> {
     return last(this.seq, predicate);
   }
 
-  map<TOut>(fn: (val: T) => TOut): Seq<TOut> {
+  map<TOut>(
+    fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut
+  ): Seq<TOut> {
     return new Seq(map(this.seq, fn));
   }
 
@@ -83,7 +89,7 @@ export class Seq<T> {
     return some(this.seq, fn);
   }
 
-  toArray() : Array<T> {
+  toArray(): Array<T> {
     return toArray(this.seq);
   }
 }
@@ -216,7 +222,7 @@ export function last<T>(
 
 export function map<T, TOut>(
   seq: SequenceFnType<T>,
-  fn: (val: T) => TOut
+  fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut
 ): SequenceFnType<TOut> {
   return function*() {
     let i = 0;
