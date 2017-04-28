@@ -26,7 +26,7 @@ export class Seq<T> {
     return new Seq(concat(this.seq, seq.seq));
   }
 
-  every(fn: PredicateType<T>) {
+  every(fn: PredicateType<T>) : boolean {
     return every(this.seq, fn);
   }
 
@@ -73,7 +73,7 @@ export class Seq<T> {
       i?: number,
       seq?: SequenceFnType<T>
     ) => boolean
-  ) {
+  ) : TAcc {
     return reduce(this.seq, fn, initialValue, fnShortCircuit);
   }
 
@@ -85,7 +85,7 @@ export class Seq<T> {
     return new Seq(slice(this.seq, begin, end));
   }
 
-  some(fn: PredicateType<T>) {
+  some(fn: PredicateType<T>) : boolean {
     return some(this.seq, fn);
   }
 
