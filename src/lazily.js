@@ -69,7 +69,7 @@ export class Seq<T> {
     initialValue: TAcc,
     fnShortCircuit?: (
       acc: TAcc,
-      item: T,
+      item?: T,
       i?: number,
       seq?: SequenceFnType<T>
     ) => boolean
@@ -239,7 +239,7 @@ export function reduce<T, TAcc>(
   initialValue: TAcc,
   fnShortCircuit?: (
     acc: TAcc,
-    item: T,
+    item?: T,
     i?: number,
     seq?: SequenceFnType<T>
   ) => boolean
