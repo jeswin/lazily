@@ -26,7 +26,7 @@ export class Seq<T> {
     return new Seq(concat(this.seq, seq.seq));
   }
 
-  every(fn: PredicateType<T>) : boolean {
+  every(fn: PredicateType<T>): boolean {
     return every(this.seq, fn);
   }
 
@@ -73,7 +73,7 @@ export class Seq<T> {
       i?: number,
       seq?: SequenceFnType<T>
     ) => boolean
-  ) : TAcc {
+  ): TAcc {
     return reduce(this.seq, fn, initialValue, fnShortCircuit);
   }
 
@@ -81,11 +81,15 @@ export class Seq<T> {
     return new Seq(reverse(this.seq));
   }
 
+  sort(fn: (a: T, b: T) => number): Seq<T> {
+    return new Seq(sort(this.seq, fn));
+  }
+
   slice(begin: number, end?: number): Seq<T> {
     return new Seq(slice(this.seq, begin, end));
   }
 
-  some(fn: PredicateType<T>) : boolean {
+  some(fn: PredicateType<T>): boolean {
     return some(this.seq, fn);
   }
 
@@ -293,6 +297,15 @@ export function some<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): boolean {
     i++;
   }
   return false;
+}
+
+export function sort<T>(seq: SequenceFnType<T>, fn: (a: T, b: T) => number): SequenceFnType<T> {
+  return function*() {
+    const all = toArray(seq).sort(fn);
+    for (const item of all) {
+      yield item;
+    }
+  };
 }
 
 export function toArray<T>(seq: SequenceFnType<T>): Array<T> {

@@ -149,6 +149,12 @@ describe("lazily", () => {
     results.should.deepEqual([5, 4, 3, 2, 1]);
   });
 
+  it(`sort()`, () => {
+    const seq = Seq.of([5, 2, 1, 4, 3]).sort((a, b) => a - b);
+    const results = toArray(seq);
+    results.should.deepEqual([1, 2, 3, 4, 5]);
+  });
+
   it(`slice(begin)`, () => {
     const seq = Seq.of([1, 2, 3, 4, 5]).slice(1);
     const results = toArray(seq);
