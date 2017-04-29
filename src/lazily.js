@@ -81,16 +81,16 @@ export class Seq<T> {
     return new Seq(reverse(this.seq));
   }
 
-  sort(fn: (a: T, b: T) => number): Seq<T> {
-    return new Seq(sort(this.seq, fn));
-  }
-
   slice(begin: number, end?: number): Seq<T> {
     return new Seq(slice(this.seq, begin, end));
   }
 
   some(fn: PredicateType<T>): boolean {
     return some(this.seq, fn);
+  }
+
+  sort(fn: (a: T, b: T) => number): Seq<T> {
+    return new Seq(sort(this.seq, fn));
   }
 
   toArray(): Array<T> {
