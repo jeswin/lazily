@@ -14,8 +14,15 @@ function toArray(seq) {
 }
 
 describe("lazily", () => {
-  it(`should return a sequence`, () => {
+  it(`returns a sequence`, () => {
     const seq = Seq.of([1, 2, 3, 4, 5]);
+    const results = toArray(seq);
+    results.should.deepEqual([1, 2, 3, 4, 5]);
+  });
+
+  it(`sequence of a sequence`, () => {
+    const seqA = Seq.of([1, 2, 3, 4, 5]);
+    const seq = Seq.of(seqA);
     const results = toArray(seq);
     results.should.deepEqual([1, 2, 3, 4, 5]);
   });
