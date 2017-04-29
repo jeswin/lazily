@@ -14,15 +14,15 @@ function toArray(seq) {
 }
 
 describe("lazily", () => {
-  it(`returns a sequence`, () => {
+  it(`Seq.of(list) returns a sequence`, () => {
     const seq = Seq.of([1, 2, 3, 4, 5]);
     const results = toArray(seq);
     results.should.deepEqual([1, 2, 3, 4, 5]);
   });
 
-  it(`sequence of a sequence`, () => {
-    const seqA = Seq.of([1, 2, 3, 4, 5]);
-    const seq = Seq.of(seqA);
+  it(`Seq.of(seq) returns a sequence`, () => {
+    const _seq = Seq.of([1, 2, 3, 4, 5]);
+    const seq = Seq.of(_seq);
     const results = toArray(seq);
     results.should.deepEqual([1, 2, 3, 4, 5]);
   });
@@ -38,6 +38,12 @@ describe("lazily", () => {
 
   it(`concat()`, () => {
     const seq = Seq.of([1, 2, 3, 4, 5]).concat(Seq.of([6, 7, 8]));
+    const results = toArray(seq);
+    results.should.deepEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  });
+
+  it(`concat() a regular list`, () => {
+    const seq = Seq.of([1, 2, 3, 4, 5]).concat([6, 7, 8]);
     const results = toArray(seq);
     results.should.deepEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });

@@ -1,15 +1,13 @@
 /* @flow */
-type PredicateType<T> = (
-  val: T,
-  i?: number,
-  seq?: SequenceFnType<T>
-) => boolean;
+type PredicateType<T> = (val: T, i?: number, seq?: SequenceFnType<T>) => boolean;
 
 export class Seq<T> {
   seq: SequenceFnType<T>;
 
-  static of(list) {
-    return new Seq(sequence(list));
+  static of<T>(list: Array<T> | SequenceFnType<T>) {
+    return list instanceof Array
+      ? new Seq(sequence(list))
+      : list instanceof Seq ? list : new Seq(list);
   }
 
   constructor(seq: SequenceFnType<T>) {
@@ -22,8 +20,8 @@ export class Seq<T> {
     }
   }
 
-  concat(seq: Seq<T>): Seq<T> {
-    return new Seq(concat(this.seq, seq.seq));
+  concat(seq: Array<T> | Seq<T>): Seq<T> {
+    return new Seq(concat(this.seq, Array.isArray(seq) ? sequence(seq) : seq.seq));
   }
 
   every(fn: PredicateType<T>): boolean {
@@ -58,21 +56,14 @@ export class Seq<T> {
     return last(this.seq, predicate);
   }
 
-  map<TOut>(
-    fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut
-  ): Seq<TOut> {
+  map<TOut>(fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut): Seq<TOut> {
     return new Seq(map(this.seq, fn));
   }
 
   reduce<TAcc>(
     fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => TAcc,
     initialValue: TAcc,
-    fnShortCircuit?: (
-      acc: TAcc,
-      item?: T,
-      i?: number,
-      seq?: SequenceFnType<T>
-    ) => boolean
+    fnShortCircuit?: (acc: TAcc, item?: T, i?: number, seq?: SequenceFnType<T>) => boolean
   ): TAcc {
     return reduce(this.seq, fn, initialValue, fnShortCircuit);
   }
@@ -122,10 +113,7 @@ export function concat<T>(
   };
 }
 
-export function every<T>(
-  seq: SequenceFnType<T>,
-  fn: PredicateType<T>
-): boolean {
+export function every<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): boolean {
   let i = 0;
   for (const item of seq()) {
     if (!fn(item, i, seq)) {
@@ -181,10 +169,7 @@ export function find<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): ?T {
   }
 }
 
-export function filter<T>(
-  seq: SequenceFnType<T>,
-  fn: PredicateType<T>
-): SequenceFnType<T> {
+export function filter<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): SequenceFnType<T> {
   return function*() {
     let i = 0;
     for (const item of seq()) {
@@ -196,10 +181,7 @@ export function filter<T>(
   };
 }
 
-export function first<T>(
-  _seq: SequenceFnType<T>,
-  predicate: PredicateType<T>
-): ?T {
+export function first<T>(_seq: SequenceFnType<T>, predicate: PredicateType<T>): ?T {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   for (const item of seq()) {
@@ -211,10 +193,7 @@ export function includes<T>(seq: SequenceFnType<T>, what: T): boolean {
   return some(seq, item => item === what);
 }
 
-export function last<T>(
-  _seq: SequenceFnType<T>,
-  predicate: PredicateType<T>
-): ?T {
+export function last<T>(_seq: SequenceFnType<T>, predicate: PredicateType<T>): ?T {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   let prev;
@@ -241,12 +220,7 @@ export function reduce<T, TAcc>(
   seq: SequenceFnType<T>,
   fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
   initialValue: TAcc,
-  fnShortCircuit?: (
-    acc: TAcc,
-    item?: T,
-    i?: number,
-    seq?: SequenceFnType<T>
-  ) => boolean
+  fnShortCircuit?: (acc: TAcc, item?: T, i?: number, seq?: SequenceFnType<T>) => boolean
 ): TAcc {
   let acc = initialValue;
   let i = 0;
