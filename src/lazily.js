@@ -4,8 +4,8 @@ type PredicateType<T> = (val: T, i?: number, seq?: SequenceFnType<T>) => boolean
 export class Seq<T> {
   seq: SequenceFnType<T>;
 
-  static of<T>(list: Array<T> | SequenceFnType<T>) {
-    return list instanceof Array
+  static of<T>(list: Array<T> | Seq<T> | SequenceFnType<T>) {
+    return Array.isArray(list)
       ? new Seq(sequence(list))
       : list instanceof Seq ? list : new Seq(list);
   }
@@ -20,8 +20,10 @@ export class Seq<T> {
     }
   }
 
-  concat(seq: Array<T> | Seq<T>): Seq<T> {
-    return new Seq(concat(this.seq, Array.isArray(seq) ? sequence(seq) : seq.seq));
+  concat(seq: Array<T> | Seq<T> | SequenceFnType<T>): Seq<T> {
+    return new Seq(
+      concat(this.seq, Array.isArray(seq) ? sequence(seq) : seq instanceof Seq ? seq.seq : seq)
+    );
   }
 
   every(fn: PredicateType<T>): boolean {
