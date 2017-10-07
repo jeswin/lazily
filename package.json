@@ -1,7 +1,7 @@
 {
   "name": "lazily",
   "version": "0.0.17",
-  "author": "Jeswin<jeswinpk@agilehead.com>",
+  "author": "Isotropy Team<isotropy@agilehead.com>",
   "scripts": {
     "test": "mocha dist/test/test.js"
   },
