@@ -1,9 +1,5 @@
-import should from "should";
-import sourceMapSupport from "source-map-support";
-
+import "should";
 import { Seq } from "../lazily";
-
-sourceMapSupport.install();
 
 function toArray(seq) {
   const results = [];
@@ -99,6 +95,18 @@ describe("lazily", () => {
   it(`first(predicate)`, () => {
     const result = Seq.of([1, 2, 3, 4, 5]).first(x => x > 3);
     result.should.equal(4);
+  });
+
+  it(`flatMap()`, async () => {
+    const seq = Seq.of([1, 2, 3, 4, 5]).flatMap(x => Seq.of([x + 10, x + 20]));
+    const results = await toArray(seq);
+    results.should.deepEqual([11, 21, 12, 22, 13, 23, 14, 24, 15, 25]);
+  });
+
+  it(`flatMap() with an array as child`, async () => {
+    const seq = Seq.of([1, 2, 3, 4, 5]).flatMap(x => [x + 10, x + 20]);
+    const results = await toArray(seq);
+    results.should.deepEqual([11, 21, 12, 22, 13, 23, 14, 24, 15, 25]);
   });
 
   it(`includes()`, () => {

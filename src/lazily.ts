@@ -1,29 +1,30 @@
-/* @flow */
-type PredicateType<T> = (val: T, i?: number, seq?: SequenceFnType<T>) => boolean;
+export type SequenceFnType<T> = () => IterableIterator<T>;
 
-export class Seq<T> {
+export type PredicateType<T> = (
+  val: T,
+  i?: number,
+  seq?: SequenceFnType<T>
+) => boolean;
+
+export class Seq<T> implements Iterable<T> {
   seq: SequenceFnType<T>;
 
-  static of<T>(list: Array<T> | Seq<T> | SequenceFnType<T>) {
-    return Array.isArray(list)
-      ? new Seq(sequence(list))
-      : list instanceof Seq ? list : new Seq(list);
+  static of<T>(list: Iterable<T>) {
+    return new Seq(sequence(list));
   }
 
   constructor(seq: SequenceFnType<T>) {
     this.seq = seq;
   }
 
-  *[Symbol.iterator](): Iterable<T> {
+  *[Symbol.iterator]() {
     for (const i of this.seq()) {
       yield i;
     }
   }
 
-  concat(seq: Array<T> | Seq<T> | SequenceFnType<T>): Seq<T> {
-    return new Seq(
-      concat(this.seq, Array.isArray(seq) ? sequence(seq) : seq instanceof Seq ? seq.seq : seq)
-    );
+  concat(seq: Iterable<T>): Seq<T> {
+    return new Seq(concat(this, seq));
   }
 
   every(fn: PredicateType<T>): boolean {
@@ -42,30 +43,43 @@ export class Seq<T> {
     return new Seq(filter(this.seq, fn));
   }
 
-  find(fn: PredicateType<T>): ?T {
+  find(fn: PredicateType<T>): T {
     return find(this.seq, fn);
   }
 
-  first(predicate: PredicateType<T>): ?T {
+  first(predicate?: PredicateType<T>): T {
     return first(this.seq, predicate);
+  }
+
+  flatMap<TOut>(
+    fn: (val: T, i: number, seq: SequenceFnType<T>) => Iterable<TOut>
+  ): Seq<TOut> {
+    return new Seq(flatMap(this.seq, fn));
   }
 
   includes(item: T): boolean {
     return includes(this.seq, item);
   }
 
-  last(predicate: PredicateType<T>): ?T {
+  last(predicate?: PredicateType<T>): T {
     return last(this.seq, predicate);
   }
 
-  map<TOut>(fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut): Seq<TOut> {
+  map<TOut>(
+    fn: (val: T, i: number, seq: SequenceFnType<T>) => TOut
+  ): Seq<TOut> {
     return new Seq(map(this.seq, fn));
   }
 
   reduce<TAcc>(
     fn: (acc: TAcc, item: T, i?: number, seq?: SequenceFnType<T>) => TAcc,
     initialValue: TAcc,
-    fnShortCircuit?: (acc: TAcc, item?: T, i?: number, seq?: SequenceFnType<T>) => boolean
+    fnShortCircuit?: (
+      acc: TAcc,
+      item?: T,
+      i?: number,
+      seq?: SequenceFnType<T>
+    ) => boolean
   ): TAcc {
     return reduce(this.seq, fn, initialValue, fnShortCircuit);
   }
@@ -91,8 +105,6 @@ export class Seq<T> {
   }
 }
 
-type SequenceFnType<T> = () => Generator<T, void, void>;
-
 export function sequence<T>(list: Iterable<T>): SequenceFnType<T> {
   return function* gen() {
     for (const item of list) {
@@ -102,20 +114,23 @@ export function sequence<T>(list: Iterable<T>): SequenceFnType<T> {
 }
 
 export function concat<T>(
-  seq: SequenceFnType<T>,
-  newSeq: SequenceFnType<T>
+  iterable: Iterable<T>,
+  newIterable: Iterable<T>
 ): SequenceFnType<T> {
   return function*() {
-    for (const i of seq()) {
+    for (const i of iterable) {
       yield i;
     }
-    for (const j of newSeq()) {
+    for (const j of newIterable) {
       yield j;
     }
   };
 }
 
-export function every<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): boolean {
+export function every<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>
+): boolean {
   let i = 0;
   for (const item of seq()) {
     if (!fn(item, i, seq)) {
@@ -161,7 +176,7 @@ export function exitAfter<T>(
   };
 }
 
-export function find<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): ?T {
+export function find<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): T {
   let i = 0;
   for (const item of seq()) {
     if (fn(item, i, seq)) {
@@ -171,7 +186,10 @@ export function find<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): ?T {
   }
 }
 
-export function filter<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): SequenceFnType<T> {
+export function filter<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>
+): SequenceFnType<T> {
   return function*() {
     let i = 0;
     for (const item of seq()) {
@@ -183,7 +201,10 @@ export function filter<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): Sequenc
   };
 }
 
-export function first<T>(_seq: SequenceFnType<T>, predicate: PredicateType<T>): ?T {
+export function first<T>(
+  _seq: SequenceFnType<T>,
+  predicate: PredicateType<T>
+): T {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   for (const item of seq()) {
@@ -191,11 +212,30 @@ export function first<T>(_seq: SequenceFnType<T>, predicate: PredicateType<T>): 
   }
 }
 
+export function flatMap<T, TOut>(
+  seq: SequenceFnType<T>,
+  fn: (val: T, i: number, seq: SequenceFnType<T>) => Iterable<TOut>
+): SequenceFnType<TOut> {
+  return function*() {
+    let i = 0;
+    for (const item of seq()) {
+      const childSeq = fn(item, i, seq);
+      for (const child of childSeq) {
+        yield child;
+      }
+      i++;
+    }
+  };
+}
+
 export function includes<T>(seq: SequenceFnType<T>, what: T): boolean {
   return some(seq, item => item === what);
 }
 
-export function last<T>(_seq: SequenceFnType<T>, predicate: PredicateType<T>): ?T {
+export function last<T>(
+  _seq: SequenceFnType<T>,
+  predicate: PredicateType<T>
+): T {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   let prev;
@@ -222,7 +262,12 @@ export function reduce<T, TAcc>(
   seq: SequenceFnType<T>,
   fn: (acc: TAcc, item: T, i: number, seq: SequenceFnType<T>) => TAcc,
   initialValue: TAcc,
-  fnShortCircuit?: (acc: TAcc, item?: T, i?: number, seq?: SequenceFnType<T>) => boolean
+  fnShortCircuit?: (
+    acc: TAcc,
+    item?: T,
+    i?: number,
+    seq?: SequenceFnType<T>
+  ) => boolean
 ): TAcc {
   let acc = initialValue;
   let i = 0;
@@ -275,7 +320,10 @@ export function some<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): boolean {
   return false;
 }
 
-export function sort<T>(seq: SequenceFnType<T>, fn: (a: T, b: T) => number): SequenceFnType<T> {
+export function sort<T>(
+  seq: SequenceFnType<T>,
+  fn: (a: T, b: T) => number
+): SequenceFnType<T> {
   return function*() {
     const all = toArray(seq).sort(fn);
     for (const item of all) {

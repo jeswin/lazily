@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "allowJs": false,
+    "target": "es2016",
+    "module": "commonjs",
+    "declaration": true,
+    "lib": ["es2017"],
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true
+  },
+  "include": ["./src/**/*"]
+}
