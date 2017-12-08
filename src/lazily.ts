@@ -43,11 +43,11 @@ export class Seq<T> implements Iterable<T> {
     return new Seq(filter(this.seq, fn));
   }
 
-  find(fn: PredicateType<T>): T {
+  find(fn: PredicateType<T>): T | undefined {
     return find(this.seq, fn);
   }
 
-  first(predicate?: PredicateType<T>): T {
+  first(predicate?: PredicateType<T>): T | undefined {
     return first(this.seq, predicate);
   }
 
@@ -61,7 +61,7 @@ export class Seq<T> implements Iterable<T> {
     return includes(this.seq, item);
   }
 
-  last(predicate?: PredicateType<T>): T {
+  last(predicate?: PredicateType<T>): T | undefined {
     return last(this.seq, predicate);
   }
 
@@ -176,7 +176,10 @@ export function exitAfter<T>(
   };
 }
 
-export function find<T>(seq: SequenceFnType<T>, fn: PredicateType<T>): T {
+export function find<T>(
+  seq: SequenceFnType<T>,
+  fn: PredicateType<T>
+): T | undefined {
   let i = 0;
   for (const item of seq()) {
     if (fn(item, i, seq)) {
@@ -203,8 +206,8 @@ export function filter<T>(
 
 export function first<T>(
   _seq: SequenceFnType<T>,
-  predicate: PredicateType<T>
-): T {
+  predicate?: PredicateType<T>
+): T | undefined {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   for (const item of seq()) {
@@ -234,8 +237,8 @@ export function includes<T>(seq: SequenceFnType<T>, what: T): boolean {
 
 export function last<T>(
   _seq: SequenceFnType<T>,
-  predicate: PredicateType<T>
-): T {
+  predicate?: PredicateType<T>
+): T | undefined {
   const seq = predicate ? filter(_seq, predicate) : _seq;
 
   let prev;

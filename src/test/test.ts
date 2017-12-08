@@ -1,7 +1,7 @@
-import "should";
 import { Seq } from "../lazily";
+const should = require("should");
 
-function toArray(seq) {
+function toArray<T>(seq: Seq<T>) : Array<T> {
   const results = [];
   for (const i of seq) {
     results.push(i);
@@ -83,18 +83,26 @@ describe("lazily", () => {
 
   it(`find()`, () => {
     const result = Seq.of([1, 2, 3, 4, 5]).find(x => x * 10 === 30);
-
-    result.should.equal(3);
+    should(result).not.be.undefined();
+    if (result) {
+      result.should.equal(3);
+    }
   });
 
   it(`first()`, () => {
     const result = Seq.of([1, 2, 3, 4, 5]).first();
-    result.should.equal(1);
+    should(result).not.be.undefined();
+    if (result) {
+      result.should.equal(1);
+    }
   });
 
   it(`first(predicate)`, () => {
     const result = Seq.of([1, 2, 3, 4, 5]).first(x => x > 3);
-    result.should.equal(4);
+    should(result).not.be.undefined();
+    if (result) {
+      result.should.equal(4);
+    }
   });
 
   it(`flatMap()`, async () => {
@@ -121,12 +129,19 @@ describe("lazily", () => {
 
   it(`last()`, () => {
     const result = Seq.of([1, 2, 3, 4, 5]).last();
-    result.should.equal(5);
+    should(result).not.be.undefined();
+    if (result) {
+      result.should.equal(5);
+    }
+
   });
 
   it(`last(predicate)`, () => {
     const result = Seq.of([1, 2, 3, 4, 5]).last(x => x < 3);
-    result.should.equal(2);
+    should(result).not.be.undefined();
+    if (result) {
+      result.should.equal(2);
+    }
   });
 
   it(`map()`, () => {
@@ -187,5 +202,4 @@ describe("lazily", () => {
     const result = Seq.of([1, 2, 3, 4, 5]).toArray();
     result.should.deepEqual([1, 2, 3, 4, 5]);
   });
-
 });
