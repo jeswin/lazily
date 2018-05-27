@@ -15,7 +15,7 @@ npm install lazily
 import { Seq } from "lazily";
 
 const seq = Seq.of([1, 2, 3])
-for await (const i of seq) {
+for (const i of seq) {
   console.log(i)
 }
 ```
@@ -24,21 +24,21 @@ for await (const i of seq) {
 Sequences are lazy. For example, in the following example only one map() action is performed irrespective of the length of the sequence.
 
 ```javascript
-const seq = await Seq.of([1, 2, 3])
+const seq = Seq.of([1, 2, 3])
   .map(x => x * 2)
   .first();
 ```
 
 ## toArray()
 ```javascript
-await Seq.of([1, 2, 3])
+Seq.of([1, 2, 3])
   .toArray()
 // [1, 2, 3]
 ```
 
 ## map(fn)
 ```javascript
-await Seq.of([1, 2, 3])
+Seq.of([1, 2, 3])
   .map(x => x * 2)
   .toArray()
 // [2, 4, 6]
@@ -46,7 +46,7 @@ await Seq.of([1, 2, 3])
 
 ## flatMap(fn)
 ```javascript
-await Seq.of([1, 2, 3])
+Seq.of([1, 2, 3])
   .flatMap(x => [x*10, x*20])
   .toArray()
 // [11, 21, 12, 22, 13, 23]
@@ -54,7 +54,7 @@ await Seq.of([1, 2, 3])
 
 ## filter(predicate)
 ```javascript
-await Seq.of([1, 2, 3, 4])
+Seq.of([1, 2, 3, 4])
   .filter(x => x > 2)
   .toArray()
 //[3, 4]
@@ -62,7 +62,7 @@ await Seq.of([1, 2, 3, 4])
 
 ## exit(predicate)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .exit(x => x > 3)
   .toArray()
 // [1, 2, 3]
@@ -70,7 +70,7 @@ await Seq.of([1, 2, 3, 4, 5])
 
 ## exitAfter(predicate)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .exitAfter(x => x > 3)
   .toArray()
 // [1, 2, 3, 4]
@@ -78,77 +78,77 @@ await Seq.of([1, 2, 3, 4, 5])
 
 ## find(predicate)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .find(x => x * 10 === 30)
 // 3
 ```
 
 ## reduce(fn)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .reduce((acc, x) => acc + x, 0)
 // 15
 ```
 
 ## short-circuited reduce(fn, initialValue, stopPredicate)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .reduce((acc, x) => acc + x, 0, acc => acc > 6)
 // 10
 ```
 
 ## first()
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .first();
 // 1
 ```
 
 ## first(predicate)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .first(x => x > 3);
 // 4
 ```
 
 ## last()
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .last();
 // 5
 ```
 
 ## last(predicate)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .last(x => x < 3);
 // 2
 ```
 
 ## every(predicate)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .every(x => x <= 5);
 // true
 ```
 
 ## some(predicate)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .some(x => x === 3);
 // true
 ```
 
 ## includes(item)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .includes(3);
 // true
 ```
 
 ## concat(seq)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .concat(Seq.of([6, 7, 8)]))
   .toArray();
 // [1, 2, 3, 4, 5, 6, 7, 8]
@@ -156,7 +156,7 @@ await Seq.of([1, 2, 3, 4, 5])
 
 ## reverse()
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .reverse()
   .toArray();
 // [5, 4, 3, 2, 1]
@@ -164,7 +164,7 @@ await Seq.of([1, 2, 3, 4, 5])
 
 ## slice(begin, end)
 ```javascript
-await Seq.of([1, 2, 3, 4, 5])
+Seq.of([1, 2, 3, 4, 5])
   .slice(2, 4)
   .toArray();
 // [3, 4, 5]
