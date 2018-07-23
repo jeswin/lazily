@@ -1,7 +1,10 @@
+import "mocha";
+import "should";
 import { Seq } from "../lazily";
+
 const should = require("should");
 
-function toArray<T>(seq: Seq<T>) : Array<T> {
+function toArray<T>(seq: Seq<T>): Array<T> {
   const results = [];
   for (const i of seq) {
     results.push(i);
@@ -133,7 +136,6 @@ describe("lazily", () => {
     if (result) {
       result.should.equal(5);
     }
-
   });
 
   it(`last(predicate)`, () => {
