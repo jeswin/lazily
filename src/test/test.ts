@@ -1,6 +1,6 @@
 import "mocha";
 import "should";
-import { Seq } from "../lazily";
+import { Seq } from "..";
 
 const should = require("should");
 
