@@ -1,9 +1,8 @@
 {
   "name": "lazily",
-  "version": "0.0.24",
+  "version": "0.0.26",
   "author": "Jeswin<jeswinpk@agilehead.com>",
   "scripts": {
-    "build": "tsc",
     "test": "tsc && mocha dist/test/test.js"
   },
   "main": "dist/index.js",
