@@ -1,8 +1,5 @@
-import "mocha";
-import "should";
-import { Seq } from "..";
-
-const should = require("should");
+import should from "should";
+import { Seq } from "../index.js";
 
 function toArray<T>(seq: Seq<T>): Array<T> {
   const results = [];
